@@ -230,9 +230,12 @@ public class Home extends JFrame {
         playFile.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 //zera tabela parsing
-//                nTerminaisStack.clear();
-//                parsinTableModel.addToken(nTerminaisStack.pop());
-//                sintaticoTable.setModel(parsinTableModel);
+                nTerminaisStack.clear();
+                parsinTableModel.wipe();
+                for(Token fnt: nTerminaisStack) {
+                    parsinTableModel.addToken(fnt);
+                }
+                sintaticoTable.setModel(parsinTableModel);
 
                 String array[] = txtType.getText().split("\n");
                 lines.clear();

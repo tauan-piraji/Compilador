@@ -235,6 +235,7 @@ public class Analizador {
     }
 
     public static Error analizadorSintaticoError(Stack<Token> finalStack, Stack<Token> nTerminais) {
+        Stack<Token> auxP = new Stack<Token>();
         if(finalStack.isEmpty()) {
             return new Error("Insira um codigo", 0);
         }
@@ -248,14 +249,13 @@ public class Analizador {
         }
 
         if(nTerminais.peek().getType() > 51) {
-            if(tabelaParsing.get("" + nTerminais.peek().getType() + "," + finalStack.peek().getType()) != null) {
+            if(!tabelaParsing.get("" + nTerminais.peek().getType() + "," + finalStack.peek().getType()).equalsIgnoreCase("null")) {
                 String simbolosDaProducao = tabelaParsing.get("" + nTerminais.peek().getType() + "," + finalStack.peek().getType());
                 nTerminais.pop();
 
                 String[] aux = simbolosDaProducao.split("&&");
-                aux = invertePilha(aux);
 
-                for (String nTerminalDaProducao : aux) {
+                for(String nTerminalDaProducao : aux) {
                     int type;
                     if(Token.populaTerminais().get(nTerminalDaProducao) != null) {
                         type = Token.populaTerminais().get(nTerminalDaProducao);
@@ -263,10 +263,14 @@ public class Analizador {
                         type = Token.populaNaoTerminais().get(nTerminalDaProducao);
                     }
                     Token tok = new Token(type, nTerminalDaProducao);
-                    nTerminais.push(tok);
+                    auxP.push(tok);
+                }
+                int auxPSize = auxP.size();
+                for(int i = 0; i < auxPSize; i++) {
+                    nTerminais.push(auxP.pop());
                 }
 
-            }else if(tabelaParsing.get("" + nTerminais.peek().getType() + "," + finalStack.peek().getType()) == null) {
+            }else if(tabelaParsing.get("" + nTerminais.peek().getType() + "," + finalStack.peek().getType()).equalsIgnoreCase("null")) {
                 nTerminais.pop();
             }
         }
@@ -274,18 +278,17 @@ public class Analizador {
         return new Error(false);
     }
 
-
-    public static String[] invertePilha(String[] pilha) {
-        String[] aux = new String[0];
-        for(int i = 0; i <= pilha.length; i ++) {
-            for(int j = pilha.length; j == 0; j--) {
-                aux[j] = pilha[i];
-            }
+    public static Stack<Token> invertePilha(Stack<Token> pilha) {
+        Stack<Token> auxFinalStack = new Stack<Token>();
+        int x = pilha.toArray().length;
+        for(int i = 0;i < x; i++) {
+            auxFinalStack.push(pilha.pop());
         }
-
-        return aux;
+        pilha.clear();
+        pilha.addAll(auxFinalStack);
+        auxFinalStack.clear();
+        return pilha;
     }
-
 
     public static boolean isInteger(Character value) {
         if(value == '1') {
