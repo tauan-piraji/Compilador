@@ -1,0 +1,22 @@
+    LMS - elementos Léxicos
+        Os caracteres válidos para a linguagem “LMS” são subdivididos em classes
+        definidas a seguir:
+        - LETRAS – A até Z, a até z
+        - DIGITOS – 0 até 9
+        - OPERADORES ARITMÉTICOS : + - * /
+        - SINAIS RELACIONAIS: = < > <> >= <=
+        - SÍMBOLOS ESPECIAIS : , ; . ( ) : .. [ ] ´ _
+        - DELIMITADORES – Os caracteres branco, final de arquivo ou um comentário
+    podem ser usados como separadores de tokens.
+        - COMENTÁRIOS – Um comentário pode ser inserido em qualquer lugar do
+    programa onde um delimitador é válido. É delimitado por (* e *).
+    Exemplo:
+    (* compilador TURTLE *)
+
+
+    Operadores
+    Os operadores sejam eles aritméticos ou lógicos, dividem-se em categorias:
+    1- operador de negação: NOT
+    2- operador de multiplicação: * / AND
+    3- operador de adição: + - OR
+    4- operadores relacionais: < > = <= >= <>
