@@ -25,16 +25,20 @@ public class Analizador {
             String aux = "";
             String aux2 = "";
             String aux3 = "";
+            String auxComent = "";
             for (Character c : lineStack.toCharArray()) {
                 characterQueue.add(c);
             }
             currentLine++;
-            if(characterQueue.isEmpty()) {
-                break;
-            }
+
             auxCharacterQueue.clear();
             auxCharacterQueue.addAll(characterQueue);
             do{
+                //linha vasia
+                if(characterQueue.isEmpty()) {
+                    break;
+                }
+
                 if(breackLineComent) {
                     auxCharacterQueue.clear();
                     auxCharacterQueue.add('(');
@@ -48,16 +52,19 @@ public class Analizador {
                 }
 
                 if (String.valueOf(characterQueue.peek()).equalsIgnoreCase("(")) {
+                    //LIMPA characterQueue JUNTO PQQQQ?
+                    auxCharacterQueue.clear();
+                    auxCharacterQueue.addAll(characterQueue);
 
-                    aux += String.valueOf(String.valueOf(characterQueue.peek()));
+                    aux += String.valueOf(String.valueOf(auxCharacterQueue.poll()));
 
-                    if (String.valueOf(characterQueue.peek()).toUpperCase(Locale.ROOT).equals("*")) {
+                    if (String.valueOf(auxCharacterQueue.peek()).toUpperCase(Locale.ROOT).equals("*")) {
                         aux += characterQueue.poll();
                         characterQueue.poll();
 
                         while (!String.valueOf(characterQueue.peek()).toUpperCase(Locale.ROOT).equals(")")) {
                             aux += String.valueOf(characterQueue.poll());
-                            //previnir problemas com quebr de linha em comentario
+                            //previnir problemas com quebra de linha em comentario
                             if(String.valueOf(characterQueue.peek()).toUpperCase(Locale.ROOT).equals(")")) {
                                 break;
                             }
