@@ -29,6 +29,9 @@ public class Analizador {
                 characterQueue.add(c);
             }
             currentLine++;
+            if(characterQueue.isEmpty()) {
+                break;
+            }
             auxCharacterQueue.clear();
             auxCharacterQueue.addAll(characterQueue);
             do{
