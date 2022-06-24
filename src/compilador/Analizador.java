@@ -33,11 +33,57 @@ public class Analizador {
             auxCharacterQueue.addAll(characterQueue);
             do{
                 if(breackLineComent) {
-                    characterQueue.add('(');
-                    characterQueue.add('*');
+                    auxCharacterQueue.clear();
+                    auxCharacterQueue.add('(');
+                    auxCharacterQueue.add('*');
+                    for(Character x : characterQueue) {
+                        auxCharacterQueue.add(x);
+                    }
+
+                    characterQueue = auxCharacterQueue;
+                    breackLineComent = false;
                 }
 
-                if(characterQueue.peek().toString().toUpperCase(Locale.ROOT).equals("'")) {
+                if (String.valueOf(characterQueue.peek()).equalsIgnoreCase("(")) {
+
+                    aux += String.valueOf(String.valueOf(characterQueue.peek()));
+
+                    if (String.valueOf(characterQueue.peek()).toUpperCase(Locale.ROOT).equals("*")) {
+                        aux += characterQueue.poll();
+                        characterQueue.poll();
+
+                        while (!String.valueOf(characterQueue.peek()).toUpperCase(Locale.ROOT).equals(")")) {
+                            aux += String.valueOf(characterQueue.poll());
+                            //previnir problemas com quebr de linha em comentario
+                            if(String.valueOf(characterQueue.peek()).toUpperCase(Locale.ROOT).equals(")")) {
+                                break;
+                            }
+                            //quebra de linha
+                            if(characterQueue.isEmpty()) {
+                                breackLineComent = true;
+                                break;
+                            }
+                        }
+
+                        if(breackLineComent) {
+                            break;
+                        }
+
+                        aux += String.valueOf(characterQueue.poll());
+
+                        aux = "";
+                    }else {
+                        aux = "";
+                        if (table.containsKey(characterQueue.peek().toString().toUpperCase())) {
+                            aux += String.valueOf(characterQueue.poll()).toUpperCase();
+                            finalStack.add(new Token(table.get(aux.toUpperCase()), aux.toUpperCase(), currentLine));
+                            aux = "";
+                        }
+                    }
+                    aux = "";
+                    auxCharacterQueue.clear();
+                    auxCharacterQueue.addAll(characterQueue);
+                }else if(characterQueue.peek().toString().toUpperCase(Locale.ROOT).equals("'")) {
                     aux += characterQueue.poll().toString();
                     while(!characterQueue.peek().toString().toUpperCase(Locale.ROOT).equals("'")) {
                         aux += characterQueue.poll().toString();
@@ -53,41 +99,7 @@ public class Analizador {
 
                     aux = "";
 
-                }else if (String.valueOf(characterQueue.peek()).toUpperCase(Locale.ROOT).equals("(")) {
-                    auxCharacterQueue.clear();
-                    auxCharacterQueue.addAll(characterQueue);
-
-                    aux += String.valueOf(auxCharacterQueue.poll());
-
-                    if (String.valueOf(auxCharacterQueue.peek()).toUpperCase(Locale.ROOT).equals("*")) {
-                        aux += characterQueue.poll();
-                        characterQueue.poll();
-
-                        while (!String.valueOf(characterQueue.peek()).toUpperCase(Locale.ROOT).equals(")")) {
-                            aux += String.valueOf(characterQueue.poll());
-                            if(characterQueue.isEmpty()) {
-                                breackLineComent = true;
-                                break;
-                            }
-                        }
-                        if(String.valueOf(characterQueue.peek()).toUpperCase(Locale.ROOT).equals(")")) {
-                            breackLineComent = false;
-                        }
-                        aux += String.valueOf(characterQueue.poll());
-
-                        aux = "";
-                    }else {
-                        aux = "";
-                        if (table.containsKey(characterQueue.peek().toString().toUpperCase())) {
-                            aux += String.valueOf(characterQueue.poll()).toUpperCase();
-                            finalStack.add(new Token(table.get(aux.toUpperCase()), aux.toUpperCase(), currentLine));
-                            aux = "";
-                        }
-                    }
-                    aux = "";
-                    auxCharacterQueue.clear();
-                    auxCharacterQueue.addAll(characterQueue);
-                } else {
+                }else {
                     if (characterQueue.peek().toString().equals(" ")) {
                         characterQueue.poll();
                         if (!aux.equals(" ") && !aux.equals("")) {
