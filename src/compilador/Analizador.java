@@ -46,13 +46,12 @@ public class Analizador {
                     for(Character x : characterQueue) {
                         auxCharacterQueue.add(x);
                     }
-
-                    characterQueue = auxCharacterQueue;
+                    characterQueue.clear();
+                    characterQueue.addAll(auxCharacterQueue);
                     breackLineComent = false;
                 }
 
                 if (String.valueOf(characterQueue.peek()).equalsIgnoreCase("(")) {
-                    //LIMPA characterQueue JUNTO PQQQQ?
                     auxCharacterQueue.clear();
                     auxCharacterQueue.addAll(characterQueue);
 
@@ -62,17 +61,14 @@ public class Analizador {
                         aux += characterQueue.poll();
                         characterQueue.poll();
 
-                        while (!String.valueOf(characterQueue.peek()).toUpperCase(Locale.ROOT).equals(")")) {
-                            aux += String.valueOf(characterQueue.poll());
-                            //previnir problemas com quebra de linha em comentario
-                            if(String.valueOf(characterQueue.peek()).toUpperCase(Locale.ROOT).equals(")")) {
-                                break;
-                            }
+                        while (!aux.contains("*)")) {
                             //quebra de linha
                             if(characterQueue.isEmpty()) {
                                 breackLineComent = true;
                                 break;
                             }
+
+                            aux += String.valueOf(characterQueue.poll());
                         }
 
                         if(breackLineComent) {
