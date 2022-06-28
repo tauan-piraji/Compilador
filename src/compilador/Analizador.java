@@ -208,9 +208,14 @@ public class Analizador {
                                 finalStack.add(new Token(table.get(aux2.toUpperCase()), aux2.toUpperCase(), currentLine));
                             } else {
                                 aux += aux2.toString();
+
                                 if (table.containsKey(aux.toUpperCase())) {
-                                    finalStack.add(new Token(table.get(aux.toUpperCase()), aux.toUpperCase(), currentLine));
-                                    aux = "";
+
+                                    if(String.valueOf(characterQueue.peek()).equalsIgnoreCase(" ")) {
+                                        finalStack.add(new Token(table.get(aux.toUpperCase()), aux.toUpperCase(), currentLine));
+                                        aux = "";
+                                    }
+
                                 } else if (characterQueue.isEmpty()) {
                                     if (!aux.equals(" ") && !aux.equals("")) {
 
