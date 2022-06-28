@@ -18,6 +18,7 @@ public class Analizador {
         Queue<Character> auxCharacterQueue = new LinkedList<>();
 
         for (String line : lines) {
+            line = line.trim();
             linesStack.add(line);
         }
 
