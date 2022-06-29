@@ -255,7 +255,7 @@ public class Home extends JFrame {
                     tokenTable.setModel(ttm);
                 }else{
                     ttm.wipe();
-                    JOptionPane.showConfirmDialog(rootPane, erro.getMessage()+" na linha: "+ erro.getLine());
+                    JOptionPane.showConfirmDialog(rootPane, erro.getMessage() + " na linha: " + erro.getLine());
                 }
             }
         });
@@ -268,34 +268,45 @@ public class Home extends JFrame {
                 if(nTerminaisStack.isEmpty()) {
                     nTerminaisStack.add(new Token(52, "PROGRAMA"));
                 }
+//                while(!finalStack.isEmpty()) {
 
-                //INVERTE PILHAS
-                finalStack = invertePilha(finalStack);
-                nTerminaisStack = invertePilha(nTerminaisStack);
-
-                //VERIFICA ERRO
-                Error error = Analizador.analizadorSintaticoError(finalStack, nTerminaisStack);
-                
-                if(!gambiarra) {
+                    //INVERTE PILHAS
+                    finalStack = invertePilha(finalStack);
                     nTerminaisStack = invertePilha(nTerminaisStack);
-                    gambiarra = true;
-                }
 
-                //DESENVERTE PILHA
-                finalStack = invertePilha(finalStack);
-                nTerminaisStack = invertePilha(nTerminaisStack);
+                    //VERIFICA ERRO
+                    Error error = Analizador.analizadorSintaticoError(finalStack, nTerminaisStack);
 
-                ttm.wipe();
-                for(Token fs: finalStack) {
-                    ttm.addToken(fs);
-                }
-                tokenTable.setModel(ttm);
+                    if(error.isStatus()) {
+                        if(error.getLine() == 0) {
+                            errorType.setText(error.getMessage());
+                        }else {
+                            errorType.setText("Era esperado Token '" + error.getMessage() + "' na linha: " + error.getLine());
+                        }
+//                        break;
+                    }
 
-                parsinTableModel.wipe();
-                for(Token fnt: nTerminaisStack) {
-                    parsinTableModel.addToken(fnt);
-                }
-                sintaticoTable.setModel(parsinTableModel);
+                    if(!gambiarra) {
+                        nTerminaisStack = invertePilha(nTerminaisStack);
+                        gambiarra = true;
+                    }
+
+                    //DESENVERTE PILHA
+                    finalStack = invertePilha(finalStack);
+                    nTerminaisStack = invertePilha(nTerminaisStack);
+
+                    ttm.wipe();
+                    for(Token fs: finalStack) {
+                        ttm.addToken(fs);
+                    }
+                    tokenTable.setModel(ttm);
+
+                    parsinTableModel.wipe();
+                    for(Token fnt: nTerminaisStack) {
+                        parsinTableModel.addToken(fnt);
+                    }
+                    sintaticoTable.setModel(parsinTableModel);
+//                }
 
             }
 

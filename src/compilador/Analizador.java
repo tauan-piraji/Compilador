@@ -8,6 +8,8 @@ public class Analizador {
     private static final HashMap<String, Integer> tableNT = Token.populaNaoTerminais();
     private static HashMap<String, String> tabelaParsing = new HashMap<String, String>();
     private static boolean breackLineComent = false;
+    private static Token objToken = new Token(0, "", 1);
+    private static Token objTokenNT = new Token(0, "", 1);
 
     public static Error Analize(Stack<Token> finalStack, List<String> lines) {
 
@@ -261,11 +263,12 @@ public class Analizador {
     public static Error analizadorSintaticoError(Stack<Token> finalStack, Stack<Token> nTerminais) {
         Stack<Token> auxP = new Stack<Token>();
         if(finalStack.isEmpty()) {
-            return new Error("Insira um codigo", 0);
+            return new Error(true, "Insira um codigo", 0);
         }
 
         Token.implementaTabelaParsing(tabelaParsing);
-
+        objToken = finalStack.peek();
+        objTokenNT = nTerminais.peek();
         if(finalStack.peek().getType() == nTerminais.peek().getType()) {
             finalStack.pop();
             nTerminais.pop();
@@ -273,29 +276,33 @@ public class Analizador {
         }
 
         if(nTerminais.peek().getType() > 51) {
-            if(!tabelaParsing.get("" + nTerminais.peek().getType() + "," + finalStack.peek().getType()).equalsIgnoreCase("null")) {
-                String simbolosDaProducao = tabelaParsing.get("" + nTerminais.peek().getType() + "," + finalStack.peek().getType());
-                nTerminais.pop();
+            try {
+                if (!tabelaParsing.get("" + nTerminais.peek().getType() + "," + finalStack.peek().getType()).equalsIgnoreCase("null")) {
+                    String simbolosDaProducao = tabelaParsing.get("" + nTerminais.peek().getType() + "," + finalStack.peek().getType());
+                    nTerminais.pop();
 
-                String[] aux = simbolosDaProducao.split("&&");
+                    String[] aux = simbolosDaProducao.split("&&");
 
-                for(String nTerminalDaProducao : aux) {
-                    int type;
-                    if(Token.populaTerminais().get(nTerminalDaProducao) != null) {
-                        type = Token.populaTerminais().get(nTerminalDaProducao);
-                    }else {
-                        type = Token.populaNaoTerminais().get(nTerminalDaProducao);
+                    for (String nTerminalDaProducao : aux) {
+                        int type;
+                        if (Token.populaTerminais().get(nTerminalDaProducao) != null) {
+                            type = Token.populaTerminais().get(nTerminalDaProducao);
+                        } else {
+                            type = Token.populaNaoTerminais().get(nTerminalDaProducao);
+                        }
+                        Token tok = new Token(type, nTerminalDaProducao);
+                        auxP.push(tok);
                     }
-                    Token tok = new Token(type, nTerminalDaProducao);
-                    auxP.push(tok);
-                }
-                int auxPSize = auxP.size();
-                for(int i = 0; i < auxPSize; i++) {
-                    nTerminais.push(auxP.pop());
-                }
+                    int auxPSize = auxP.size();
+                    for (int i = 0; i < auxPSize; i++) {
+                        nTerminais.push(auxP.pop());
+                    }
 
-            }else if(tabelaParsing.get("" + nTerminais.peek().getType() + "," + finalStack.peek().getType()).equalsIgnoreCase("null")) {
-                nTerminais.pop();
+                } else if (tabelaParsing.get("" + nTerminais.peek().getType() + "," + finalStack.peek().getType()).equalsIgnoreCase("null")) {
+                    nTerminais.pop();
+                }
+            }catch (Exception e) {
+                return new Error(true, objTokenNT.getText(), objToken.getLine());
             }
         }
 
