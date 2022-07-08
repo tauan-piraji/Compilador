@@ -1,18 +1,24 @@
 package compilador;
 
 import exceptions.Error;
+
 import java.util.*;
 
-public class Analizador {
+public class Analisador {
     private static final HashMap<String, Integer> table = Token.populaTerminais();
-    private static final HashMap<String, Integer> tableNT = Token.populaNaoTerminais();
     private static HashMap<String, String> tabelaParsing = new HashMap<String, String>();
+    private static HashMap<String, Simbolo> mapVariaveis = new HashMap<String, Simbolo>();
+    private static final List<String> palavrasReservadas = palavrasReservadas();
     private static boolean breackLineComent = false;
     private static Token objToken = new Token(0, "", 1);
     private static Token objTokenNT = new Token(0, "", 1);
+    private static int X = 0;
+    private static Boolean nvlprocedu = false;
 
     public static Error Analize(Stack<Token> finalStack, List<String> lines) {
-
+        mapVariaveis = new HashMap<String, Simbolo>();
+        X = 0;
+        nvlprocedu = false;
         int currentLine = 0;
         Stack<String> linesStack = new Stack<String>();
         Stack<String> auxStack = new Stack<String>();
@@ -28,7 +34,7 @@ public class Analizador {
             String aux = "";
             String aux2 = "";
             String aux3 = "";
-            String auxComent = "";
+            String aux4 = "";
             for (Character c : lineStack.toCharArray()) {
                 characterQueue.add(c);
             }
@@ -211,15 +217,18 @@ public class Analizador {
                             } else {
                                 aux += aux2.toString();
 
+                                aux = aux.replaceAll(" ", "");
+
                                 if (table.containsKey(aux.toUpperCase())) {
 
-                                    if(String.valueOf(characterQueue.peek()).equalsIgnoreCase(" ")) {
+                                    if (verificaSimboloDelimitadorIgual(String.valueOf(characterQueue.peek())) || characterQueue.peek() == null) {
+
                                         finalStack.add(new Token(table.get(aux.toUpperCase()), aux.toUpperCase(), currentLine));
                                         aux = "";
                                     }
 
-                                } else if (characterQueue.isEmpty()) {
-                                    if (!aux.equals(" ") && !aux.equals("")) {
+                                } else if (verificaSimboloDelimitadorIgual(String.valueOf(characterQueue.peek())) || characterQueue.isEmpty()) {
+                                    if (!aux.equalsIgnoreCase(" ") && !aux.equalsIgnoreCase("")) {
 
                                         try {
                                             Double.parseDouble(aux);
@@ -309,6 +318,183 @@ public class Analizador {
         return new Error(false);
     }
 
+    public static Error analisadorSintaticoSemantico(Stack<Token> finalStack, Stack<Token> nTerminais) {
+        Stack<Token> auxP = new Stack<Token>();
+        Simbolo simboloAux = new Simbolo();
+        String nomeSimbolo;
+
+        objToken = finalStack.peek();
+        objTokenNT = nTerminais.peek();
+
+        if(finalStack.isEmpty()) {
+            return new Error(true, "Insira um codigo", 0);
+        }
+
+        if(finalStack.peek().getType() == nTerminais.peek().getType()) {
+            finalStack.pop();
+            nTerminais.pop();
+
+            //implementa tabela de tokens para analize semantica
+            //procedure == function, declara niveis
+            if(objToken.getType() == 5) {
+                X = 1;
+                nvlprocedu = true;
+            }
+
+            if(X == 1) {
+                if(objToken.getType() == 25) {
+                    mapVariaveis.put(objToken.getText() + objToken.getText() + "Inteiro",
+                            new Simbolo(objToken.getText(), objToken.getText(), "Inteiro", nvlprocedu));
+                    X = 0;
+                }
+            }
+
+            if(objToken.getType() == 7 && nvlprocedu) {
+                nvlprocedu = false;
+                X = 5;
+            }
+
+            if(objToken.getType() == 6) {
+                X = 2;
+            }
+
+            if(objToken.getType() == 11) {
+                X = 7;
+            }
+
+            if(objToken.getType() == 3) {
+                X = 10;
+            }
+
+            if(objToken.getType() == 4) {
+                X = 10;
+            }
+
+            if(X == 2) {
+                if(objToken.getType() == 25) {
+                    if(!mapVariaveis.containsKey(objToken.getText() + objToken.getText() + "Inteiro")) {
+                        return new Error(true, "Erro semantico, simbolo (" + objToken.getText() + ") não foi declarado ainda", objToken.getLine());
+                    }
+                }
+                if(objToken.getType() == 7) {
+                    nvlprocedu = false;
+                    X = 3;
+                }
+            }
+
+            if(X == 3) {
+                if(objToken.getType() == 25) {
+                    if(!mapVariaveis.containsKey(objToken.getText() + objToken.getText() + "Inteiro")) {
+                        return new Error(true, "Erro semantico, simbolo (" + objToken.getText() + ") não foi declarado ainda", objToken.getLine());
+                    }
+                }
+
+                if(objToken.getType() == 11) {
+                    X = 4;
+                }
+            }
+
+            if (X == 4) {
+                //verifica se o procedimento foi chamado corretamente
+                if (objToken.getType() == 25) {
+
+                    if(!mapVariaveis.containsKey(objToken.getText() + objToken.getText() + "Inteiro")) {
+                        return new Error(true, "Erro semantico, simbolo (" + objToken.getText() + ") não foi declarado ainda", objToken.getLine());
+                    }
+                }
+
+            }
+
+            if(X == 5) {
+                if (objToken.getType() == 25) {
+
+                    if(!mapVariaveis.containsKey(objToken.getText() + objToken.getText() + "Inteiro")) {
+                        return new Error(true, "Erro semantico, simbolo (" + objToken.getText() + ") não foi declarado ainda", objToken.getLine());
+                    }
+                }
+
+                if(objToken.getType() == 11) {
+                    X = 6;
+                }
+            }
+
+            if(X == 6) {
+                if (objToken.getType() == 25) {
+
+                    if(!mapVariaveis.containsKey(objToken.getText() + objToken.getText() + "Inteiro")) {
+                        return new Error(true, "Erro semantico, simbolo (" + objToken.getText() + ") não foi declarado ainda", objToken.getLine());
+                    }
+                }
+
+
+                if(objToken.getType() == 11) {
+                    X = 7;
+                    nvlprocedu = true;
+                }
+
+            }
+
+            if(X == 7) {
+                if (objToken.getType() == 25) {
+                    if(!mapVariaveis.containsKey(objToken.getText() + objToken.getText() + "Inteiro")) {
+                        return new Error(true, "Erro semantico, simbolo (" + objToken.getText() + ") não foi declarado ainda", objToken.getLine());
+                    }
+                }
+            }
+
+            if(X == 10) {
+                if(objToken.getType() == 25) {
+                    if(mapVariaveis.containsKey(objToken.getText() + objToken.getText() + "Inteiro")) {
+                        simboloAux = mapVariaveis.get(objToken.getText() + objToken.getText() + "Inteiro");
+                        if(simboloAux.getNivel() && nvlprocedu) {
+                            return new Error(true, "Erro semantico, simbolo (" + objToken.getText() + ") declarada dentro da procedure", objToken.getLine());
+                        }
+                        //return new Error(true, "Erro semantico, simbolo (" + objToken.getText() + ") repetido", objToken.getLine());
+                    }else {
+                        mapVariaveis.put(objToken.getText() + objToken.getText() + "Inteiro",
+                                new Simbolo(objToken.getText(), objToken.getText(), "Inteiro", nvlprocedu));
+                    }
+                }
+            }
+
+            return new Error(false);
+        }
+
+        Token.implementaTabelaParsing(tabelaParsing);
+        if(nTerminais.peek().getType() > 51) {
+            try {
+                if (!tabelaParsing.get("" + nTerminais.peek().getType() + "," + finalStack.peek().getType()).equalsIgnoreCase("null")) {
+                    String simbolosDaProducao = tabelaParsing.get("" + nTerminais.peek().getType() + "," + finalStack.peek().getType());
+                    nTerminais.pop();
+
+                    String[] aux = simbolosDaProducao.split("&&");
+
+                    for (String nTerminalDaProducao : aux) {
+                        int type;
+                        if (Token.populaTerminais().get(nTerminalDaProducao) != null) {
+                            type = Token.populaTerminais().get(nTerminalDaProducao);
+                        } else {
+                            type = Token.populaNaoTerminais().get(nTerminalDaProducao);
+                        }
+                        Token tok = new Token(type, nTerminalDaProducao);
+                        auxP.push(tok);
+                    }
+                    int auxPSize = auxP.size();
+                    for (int i = 0; i < auxPSize; i++) {
+                        nTerminais.push(auxP.pop());
+                    }
+
+                } else if (tabelaParsing.get("" + nTerminais.peek().getType() + "," + finalStack.peek().getType()).equalsIgnoreCase("null")) {
+                    nTerminais.pop();
+                }
+            }catch (Exception e) {
+                return new Error(true, "Era esperado Token '" + objTokenNT.getText(), objToken.getLine());
+            }
+        }
+
+        return new Error(false);
+    }
+
     public static Stack<Token> invertePilha(Stack<Token> pilha) {
         Stack<Token> auxFinalStack = new Stack<Token>();
         int x = pilha.toArray().length;
@@ -344,4 +530,31 @@ public class Analizador {
             return false;
         }
     }
+
+    public static List<String> palavrasReservadas() {
+        List<String> palavras = new ArrayList<String>();
+        String p[] = {"AND", "ARRAY", "BEGIN", "CALL", "CASE", "CONST", "DO", "ELSE", "END", "FOR", "GOTO",
+                "IF", "INTEGER", "LABEL", "NOT", "OF", "OR", "PROCEDURE", "PROGRAM", "READLN",
+                "REPEAT", "THEN", "TO", "UNTIL", "VAR", "WHILE", "WRITELN"};
+        palavras.addAll(Arrays.asList(p));
+        return palavras;
+    }
+
+    public static List<String> simbolosDelimitadores() {
+        List<String> palavras = new ArrayList<String>();
+        String p[] = {":",";", ",", ".", "(", ")", ":", "..", "[", "]", "´", "\n", " ", null};
+        palavras.addAll(Arrays.asList(p));
+        return palavras;
+    }
+
+    public static boolean verificaSimboloDelimitadorIgual(String palavra){
+        for (String sim : simbolosDelimitadores()) {
+            if (palavra.equalsIgnoreCase(sim)) {
+                return true;
+            }
+        }
+        return false;
+
+    }
+
 }

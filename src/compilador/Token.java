@@ -6,13 +6,13 @@ public class Token {
      private int type;
      private String text;
      private int line;
-     private boolean terminal;
+     private Integer nivel;
 
-     public Token(int type, String text, int line, boolean terminal) {
+     public Token(int type, String text, int line, int nivel) {
           this.type = type;
           this.text = text;
           this.line = line;
-          this.terminal = terminal;
+          this.nivel = nivel;
      }
 
      public Token(int type, String text, int line) {
@@ -24,10 +24,6 @@ public class Token {
      public Token(int type, String text) {
           this.type = type;
           this.text = text;
-     }
-
-     public Token() {
-
      }
 
      public int getType() {
@@ -54,12 +50,12 @@ public class Token {
           this.line = line;
      }
 
-     public boolean isTerminal() {
-          return terminal;
+     public int getNivel() {
+          return nivel;
      }
 
-     public void setTerminal(boolean terminal) {
-          this.terminal = terminal;
+     public void setNivel(int nivel) {
+          this.nivel = nivel;
      }
 
      public static HashMap<String, Integer> populaTerminais() {

@@ -1,7 +1,7 @@
 package view;
 
 import exceptions.Error;
-import compilador.Analizador;
+import compilador.Analisador;
 import compilador.Token;
 import pathController.FileMain;
 import pathController.FileService;
@@ -46,17 +46,18 @@ public class Home extends JFrame {
     private JButton deleteFile;
     private JButton playFile;
     private JButton playSintatico;
+    private JButton playDebugger;
     private JFileChooser fc;
     private JFileChooser dc;
     private Stack<Token> finalStack;
+    private Stack<Token> semanticofinalStack;
     private Stack<Token> nTerminaisStack;
     HashMap<String, Integer> map;
     private FileMain fileMain;
     private FileService fileService;
     private List<String> lines;
     private Stack<Token> auxFinalStack;
-    private Analizador analizador;
-    private Boolean gambiarra = false;
+    private Analisador analisador;
 
     public void setFinalStack(Stack<Token> finalStack) {
         this.finalStack = finalStack;
@@ -80,6 +81,7 @@ public class Home extends JFrame {
         fileMain = new FileMain();
         fileService = new FileService();
         finalStack = new Stack<Token>();
+        semanticofinalStack = new Stack<Token>();
         nTerminaisStack = new Stack<Token>();
         auxFinalStack = new Stack<Token>();
         map = new HashMap<String, Integer>();
@@ -235,6 +237,7 @@ public class Home extends JFrame {
                 for(Token fnt: nTerminaisStack) {
                     parsinTableModel.addToken(fnt);
                 }
+                errorType.setText("");
                 sintaticoTable.setModel(parsinTableModel);
 
                 String array[] = txtType.getText().split("\n");
@@ -244,15 +247,16 @@ public class Home extends JFrame {
                 }
                 finalStack.clear();
 
-                Error erro = Analizador.Analize(finalStack, lines);
+                Error erro = Analisador.Analize(finalStack, lines);
 
                 if (!erro.isStatus()) {
                     ttm.wipe();
-
+                    finalStack = invertePilha(finalStack);
                     for (Token t : finalStack) {
                         ttm.addToken(t);
                     }
                     tokenTable.setModel(ttm);
+                    semanticofinalStack.addAll(finalStack);
                 }else{
                     ttm.wipe();
                     JOptionPane.showConfirmDialog(rootPane, erro.getMessage() + " na linha: " + erro.getLine());
@@ -268,32 +272,19 @@ public class Home extends JFrame {
                 if(nTerminaisStack.isEmpty()) {
                     nTerminaisStack.add(new Token(52, "PROGRAMA"));
                 }
-//                while(!finalStack.isEmpty()) {
-
-                    //INVERTE PILHAS
-                    finalStack = invertePilha(finalStack);
-                    nTerminaisStack = invertePilha(nTerminaisStack);
+                while(!finalStack.isEmpty()) {
 
                     //VERIFICA ERRO
-                    Error error = Analizador.analizadorSintaticoError(finalStack, nTerminaisStack);
+                    Error error = Analisador.analizadorSintaticoError(finalStack, nTerminaisStack);
 
                     if(error.isStatus()) {
                         if(error.getLine() == 0) {
                             errorType.setText(error.getMessage());
                         }else {
-                            errorType.setText("Era esperado Token '" + error.getMessage() + "' na linha: " + error.getLine());
+                            errorType.setText(error.getMessage() + "' na linha: " + error.getLine());
                         }
-//                        break;
+                       break;
                     }
-
-                    if(!gambiarra) {
-                        nTerminaisStack = invertePilha(nTerminaisStack);
-                        gambiarra = true;
-                    }
-
-                    //DESENVERTE PILHA
-                    finalStack = invertePilha(finalStack);
-                    nTerminaisStack = invertePilha(nTerminaisStack);
 
                     ttm.wipe();
                     for(Token fs: finalStack) {
@@ -306,10 +297,45 @@ public class Home extends JFrame {
                         parsinTableModel.addToken(fnt);
                     }
                     sintaticoTable.setModel(parsinTableModel);
-//                }
+                }
 
             }
 
+        });
+
+        playDebugger = new JButton();
+        playDebugger.setPreferredSize(new Dimension(60, 60));
+        playDebugger.setIcon(new ImageIcon(getClass().getResource("/img/playDebugger.png")));
+        playDebugger.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if(nTerminaisStack.isEmpty()) {
+                    nTerminaisStack.add(new Token(52, "PROGRAMA"));
+                }
+
+                //VERIFICA ERRO
+                Error error = Analisador.analisadorSintaticoSemantico(finalStack, nTerminaisStack);
+
+                if(error.isStatus()) {
+                    if(error.getLine() == 0) {
+                        errorType.setText(error.getMessage());
+                    }else {
+                        errorType.setText("Era esperado Token '" + error.getMessage() + "' na linha: " + error.getLine());
+                    }
+
+                }
+
+                ttm.wipe();
+                for(Token fs: finalStack) {
+                    ttm.addToken(fs);
+                }
+                tokenTable.setModel(ttm);
+
+                parsinTableModel.wipe();
+                for(Token fnt: nTerminaisStack) {
+                    parsinTableModel.addToken(fnt);
+                }
+                sintaticoTable.setModel(parsinTableModel);
+            }
         });
 
         menuBar.add(newFile);
@@ -318,6 +344,7 @@ public class Home extends JFrame {
         menuBar.add(deleteFile);
         menuBar.add(playFile);
         menuBar.add(playSintatico);
+        menuBar.add(playDebugger);
         getContentPane().add(menuBar);
     }
 

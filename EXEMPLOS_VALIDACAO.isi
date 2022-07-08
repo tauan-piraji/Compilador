@@ -137,7 +137,7 @@ begin
 end;
 BEGIN
 X:=10;
-CALL p((10 +5) * X)
+CALL p ((10 +5) * X)
 
 END.
 
@@ -154,7 +154,7 @@ PROGRAM TESTE123;
 		array_b, array_c, array_d : ARRAY[0..1000] OF INTEGER;
 	
 	(*Declaração de procedure, inicia novo bloco*)
-	PROCEDURE p_teste(idd : INTEGER);
+	PROCEDURE p_teste (idd : INTEGER);
 		LABEL
 			label_a, label_b;
 			
@@ -177,8 +177,8 @@ BEGIN
 	call p_teste(X);
 END.
 
-Exemplo 6: -----------------------------------------------------------------------------------------------
-(*TESTE - Exemplo inválido: A varivel 'A' foi declarada em duplicidade*)
+Exemplo 7: -----------------------------------------------------------------------------------------------
+(*TESTE 7 - Exemplo inválido: A varivel 'A' foi declarada em duplicidade*)
 PROGRAM TESTE123;
 	CONST
 		a = -100;
@@ -189,8 +189,8 @@ BEGIN
 	Z := 0;
 END.
 
-Exemplo 7: -----------------------------------------------------------------------------------------------
-(*TESTE - Exemplo válido: multiplicação*)
+Exemplo 8: -----------------------------------------------------------------------------------------------
+(*TESTE 8 - Exemplo válido: multiplicação*)
 PROGRAM TESTE123;
 	CONST
 		a = -100;
@@ -201,61 +201,61 @@ BEGIN
 	Z := a * Y + 2;
 END.
 
-Exemplo 8: -----------------------------------------------------------------------------------------------
-(*TESTE - valido com duas procedures*)
-PROGRAM TESTE_PROC;
-	(*Proc A*)
-	PROCEDURE p_a(idd : INTEGER);
-		VAR 
-		    X, Y, Z : INTEGER;
-	BEGIN
-		X := X * Y;
-	END;
-
-	(*Proc B com os mesmos dados de A*)
-	PROCEDURE p_b(idd : INTEGER);
-		VAR 
-		    X, Y, Z : INTEGER;
-	BEGIN
-		X := Z *Z;
-	END;
-
-
-BEGIN
-	call p_a(10 + 2);
-	call p_b(5);
-END.
-
-Exemplo 8: -----------------------------------------------------------------------------------------------
-(*TESTE - inválido: procedure duplicada*)
-PROGRAM TESTE_PROC;
-	(*Proc A*)
-	PROCEDURE p_a(idd : INTEGER);
-		VAR 
-		    X, Y, Z : INTEGER;
-	BEGIN
-		X := X * Y;
-	END;
-
-	(*Proc B com os mesmos dados de A*)
-	PROCEDURE p_a(idd : INTEGER);
-		VAR 
-		    X, Y, Z : INTEGER;
-	BEGIN
-		X := Z *Z;
-	END;
-
-
-BEGIN
-	call p_a(10 + 2);
-	call p_b(5);
-END.
-
-
-
-
 Exemplo 9: -----------------------------------------------------------------------------------------------
-(*TESTE 9 - Utilizando Arrays*)
+(*TESTE 9 - valido com duas procedures*)
+PROGRAM TESTE_PROC;
+	(*Proc A*)
+	PROCEDURE p_a (idd : INTEGER);
+		VAR 
+		    X, Y, Z : INTEGER;
+	BEGIN
+		X := X * Y;
+	END;
+
+	(*Proc B com os mesmos dados de A*)
+	PROCEDURE p_b (idd : INTEGER);
+		VAR 
+		    X, Y, Z : INTEGER;
+	BEGIN
+		X := Z *Z;
+	END;
+
+
+BEGIN
+	call p_a(10 + 2);
+	call p_b(5);
+END.
+
+Exemplo 10: -----------------------------------------------------------------------------------------------
+(*TESTE 10 - inválido: procedure duplicada*)
+PROGRAM TESTE_PROC;
+	(*Proc A*)
+	PROCEDURE p_a (idd : INTEGER);
+		VAR 
+		    X, Y, Z : INTEGER;
+	BEGIN
+		X := X * Y;
+	END;
+
+	(*Proc B com os mesmos dados de A*)
+	PROCEDURE p_a (idd : INTEGER);
+		VAR 
+		    X, Y, Z : INTEGER;
+	BEGIN
+		X := Z *Z;
+	END;
+
+
+BEGIN
+	call p_a (10 + 2);
+	call p_b (5);
+END.
+
+
+
+
+Exemplo 11: -----------------------------------------------------------------------------------------------
+(*TESTE 11 - Utilizando Arrays*)
 PROGRAM TESTE123;
 	VAR 
 		 X, Y, Z : INTEGER;
