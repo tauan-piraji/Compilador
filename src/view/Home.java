@@ -275,7 +275,7 @@ public class Home extends JFrame {
                 while(!finalStack.isEmpty()) {
 
                     //VERIFICA ERRO
-                    Error error = Analisador.analizadorSintaticoError(finalStack, nTerminaisStack);
+                    Error error = Analisador.analisadorSintaticoSemantico(finalStack, nTerminaisStack);
 
                     if(error.isStatus()) {
                         if(error.getLine() == 0) {

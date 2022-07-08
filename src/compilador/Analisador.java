@@ -334,8 +334,6 @@ public class Analisador {
             finalStack.pop();
             nTerminais.pop();
 
-            //implementa tabela de tokens para analize semantica
-            //procedure == function, declara niveis
             if(objToken.getType() == 5) {
                 X = 1;
                 nvlprocedu = true;
@@ -375,6 +373,10 @@ public class Analisador {
                     if(!mapVariaveis.containsKey(objToken.getText() + objToken.getText() + "Inteiro")) {
                         return new Error(true, "Erro semantico, simbolo (" + objToken.getText() + ") não foi declarado ainda", objToken.getLine());
                     }
+                    simboloAux = mapVariaveis.get(objToken.getText() + objToken.getText() + "Inteiro");
+                    if(simboloAux.getNivel() && !nvlprocedu) {
+                        return new Error(true, "Erro semantico, simbolo (" + objToken.getText() + ") declarada dentro da procedure", objToken.getLine());
+                    }
                 }
                 if(objToken.getType() == 7) {
                     nvlprocedu = false;
@@ -407,9 +409,9 @@ public class Analisador {
 
             if(X == 5) {
                 if (objToken.getType() == 25) {
-
-                    if(!mapVariaveis.containsKey(objToken.getText() + objToken.getText() + "Inteiro")) {
-                        return new Error(true, "Erro semantico, simbolo (" + objToken.getText() + ") não foi declarado ainda", objToken.getLine());
+                    simboloAux = mapVariaveis.get(objToken.getText() + objToken.getText() + "Inteiro");
+                    if(simboloAux.getNivel() && nvlprocedu) {
+                        return new Error(true, "Erro semantico, simbolo (" + objToken.getText() + ") declarada dentro da procedure", objToken.getLine());
                     }
                 }
 
